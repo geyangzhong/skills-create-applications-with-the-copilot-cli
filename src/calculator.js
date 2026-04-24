@@ -1,11 +1,13 @@
 #!/usr/bin/env node
-// Calculator CLI
+// Calculator CLI (uses calculator-lib)
 // Supported operations: add, sub, mul, div
 // Examples:
 //   node src/calculator.js add 2 3    => 5
 //   node src/calculator.js sub 5 2    => 3
 //   node src/calculator.js mul 4 6    => 24
 //   node src/calculator.js div 10 2   => 5
+
+const { add, sub, mul, div } = require('./calculator-lib');
 
 function printHelp() {
   console.log('Usage: node src/calculator.js <command> <a> <b>');
@@ -34,26 +36,27 @@ const cmd = argv[0].toLowerCase();
 const a = Number(argv[1]);
 const b = Number(argv[2]);
 
-if (Number.isNaN(a) || Number.isNaN(b)) {
+if (!Number.isFinite(a) || !Number.isFinite(b)) {
   errorExit('Operands must be numeric.');
 }
 
 let result;
 switch (cmd) {
   case 'add':
-    result = a + b;
+    result = add(a, b);
     break;
   case 'sub':
-    result = a - b;
+    result = sub(a, b);
     break;
   case 'mul':
-    result = a * b;
+    result = mul(a, b);
     break;
   case 'div':
-    if (b === 0) {
-      errorExit('Division by zero.');
+    try {
+      result = div(a, b);
+    } catch (err) {
+      errorExit(err.message || 'Division error');
     }
-    result = a / b;
     break;
   default:
     errorExit('Unknown command. Supported commands: add, sub, mul, div');
